@@ -16,5 +16,7 @@ We compared TCDformer with state-of-the-art attention models, including non-Stat
 ![Table.1](images/t1.png)
 #### B. Comparison of Model Prediction Accuracy
 ![Table.2](images/t2.png)
-#### C. Ablation Study
+#### C. Model Computational Complexity Analysis
 ![Table.3](images/t3.png)
+#### D. Ablation Study
+![Table.4](images/t4.png)
