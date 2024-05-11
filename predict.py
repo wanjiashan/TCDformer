@@ -77,7 +77,7 @@ print(args)
 Exp = Exp_Main
 
 if args.is_training:
-    for ii in range(args.itr):
+    for itr in range(args.itr):
         # setting record of experiments
         setting = '{}_{}_{}_modes{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}'.format(
             args.task_id,
@@ -98,7 +98,7 @@ if args.is_training:
             args.embed,
             args.distil,
             args.des,
-            ii)
+            itr)
 
         exp = Exp(args)  # set experiments
         print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
@@ -113,7 +113,7 @@ if args.is_training:
 
         torch.cuda.empty_cache()
 else:
-    ii = 0
+    itr = 0
     setting = '{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}'.format(args.model_id,
                                                                                                   args.model,
                                                                                                   args.data,
@@ -129,7 +129,7 @@ else:
                                                                                                   args.factor,
                                                                                                   args.embed,
                                                                                                   args.distil,
-                                                                                                  args.des, ii)
+                                                                                                  args.des, itr)
 
     exp = Exp(args)  # set experiments
     print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))

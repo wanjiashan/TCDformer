@@ -3,29 +3,49 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class LLSA(nn.Module):
-    def __init__(self, window_size=5, hidden_size=10):
+    def __init__(self, num_features: int, eps=1e-5, affine=True, window_size=5, hidden_size=10, change_point_threshold=0.1):
         super(LLSA, self).__init__()
+        self.num_features = num_features
+        self.eps = eps
+        self.affine = affine
         self.window_size = window_size
         self.hidden_size = hidden_size
+        self.change_point_threshold = nn.Parameter(torch.tensor(change_point_threshold))
         self.linear = nn.Linear(window_size, hidden_size)
-        self.change_point_threshold = nn.Parameter(torch.tensor(0.1))
+        if self.affine:
+            self._init_params()
 
-    def forward(self, series):
-        # (batch_size, time_steps)
-        batch_size, time_steps = series.shape
-        change_points = []
-        losses = []
+    def forward(self, x, mode:str):
+        if mode == 'norm':
+            self._get_statistics(x)
+            x = self._normalize(x)
+        elif mode == 'denorm':
+            x = self._denormalize(x)
+        else:
+            raise NotImplementedError
+        return x
 
-        for i in range(time_steps - self.window_size):
-            local_series = series[:, i:i+self.window_size]
-            target = series[:, i+1:i+self.window_size+1]
-            transformed = self.linear(local_series)
-            loss = F.mse_loss(transformed, target)
-            losses.append(loss)
+    def _init_params(self):
+        self.affine_weight = nn.Parameter(torch.ones(self.num_features))
+        self.affine_bias = nn.Parameter(torch.zeros(self.num_features))
 
-            if i > 0:
-                diff = torch.abs(losses[i] - losses[i-1])
-                if diff > self.change_point_threshold:
-                    change_points.append((i, diff.item()))
+    def _get_statistics(self, x):
+        dim2reduce = tuple(range(1, x.ndim-1))
+        self.mean = torch.mean(x, dim=dim2reduce, keepdim=True).detach()
+        self.stdev = torch.sqrt(torch.var(x, dim=dim2reduce, keepdim=True, unbiased=False) + self.eps).detach()
 
-        return change_points, torch.stack(losses)
+    def _normalize(self, x):
+        x = x - self.mean
+        x = x / self.stdev
+        if self.affine:
+            x = x * self.affine_weight
+            x = x + self.affine_bias
+        return x
+
+    def _denormalize(self, x):
+        if self.affine:
+            x = x - self.affine_bias
+            x = x / (self.affine_weight + self.eps*self.eps)
+        x = x * self.stdev
+        x = x + self.mean
+        return x
