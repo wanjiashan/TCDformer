@@ -1,9 +1,8 @@
 export CUDA_VISIBLE_DEVICES=0
-cd ..
 
 for attention in Wavelet Fourier Time
 do
-
+# traffic
 for preLen in 96 192 336 720
 do
 python -u run.py \
