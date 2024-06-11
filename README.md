@@ -20,3 +20,24 @@ We compared TCDformer with state-of-the-art attention models, including non-Stat
 ![Table.3](images/t3.png)
 #### D. Ablation Study
 ![Table.4](images/t4.png)
+
+
+### Train
+>We are using Python 3.8.18; Pytroch version '2.1.0+cu121'; GPU model GeForce RTX-4090.
+- Create a Python virtual environment
+```
+conda create -n pytorch python=3.8
+```
+
+- Activate virtual environment
+```
+conda activate pytorch
+```
+- Install the required packages
+```
+pip install -r requirements.txt
+```
+- Run to train
+```
+bash run/run.sh
+```
